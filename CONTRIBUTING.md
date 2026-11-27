@@ -57,6 +57,27 @@ ci(repo): path-filtered backend and frontend workflows
 5. Keep current with `git rebase develop`; force-push only your own branch, with `--force-with-lease`.
 6. **Squash merge** once CI is green and reviewed; branch auto-deletes.
 
+### PR titles and descriptions
+
+Title format (it becomes the squash commit, so it must read well in `git log`):
+
+```
+<type>(<area>[/<module>]): <what changes, imperative, specific> (<IDs>)
+```
+
+- ≤ 72 characters, imperative ("add", not "added"), no trailing period.
+- Say *what* changes, not *which milestone*: the milestone is linked separately.
+- Include requirement IDs when the PR implements or tests them.
+
+| Weak | Better |
+| --- | --- |
+| `M1 setup` | `chore(be): init Supabase stack with private schema and extensions` |
+| `fix bug` | `fix(be/workspace): block removing the last Owner (BR-01)` |
+| `board stuff` | `feat(fe/board): drag tasks between columns with rollback (FR-VIS-04)` |
+| `update docs` | `docs(repo): document develop/main release and hotfix flow` |
+
+The description follows the PR template: **Summary** (2–4 bullets of outcomes), **Changes** grouped by backend / frontend / repo with file paths, **How to test** (exact commands), **Risks and follow-ups**, and the checklist.
+
 ## CI (path-filtered)
 
 | Workflow | Runs when | Jobs |

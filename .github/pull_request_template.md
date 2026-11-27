@@ -1,9 +1,33 @@
-## What and why
+<!-- Title: <type>(<area>[/<module>]): <specific change> (<IDs>)  — see CONTRIBUTING.md -->
 
-<!-- Short description. Milestone: M? -->
+## Summary
+
+<!-- 2–4 bullets: what this PR achieves and why -->
 
 Area: <!-- backend | frontend | both | repo -->
-Requirement IDs: <!-- FR-..., BR-..., NFR-... -->
+Milestone: <!-- M1 … M9 -->
+Requirement IDs: <!-- FR-..., BR-..., NFR-... or "none" -->
+
+## Changes
+
+**Backend**
+- 
+
+**Frontend**
+- 
+
+**Repo / docs / CI**
+- 
+
+## How to test
+
+```bash
+# exact commands a reviewer runs
+```
+
+## Risks and follow-ups
+
+- 
 
 ## Checklist
 
@@ -24,4 +48,3 @@ Requirement IDs: <!-- FR-..., BR-..., NFR-... -->
 
 - [ ] No secrets committed; `docs/PROGRESS.md` updated if the session ends here
 
-## Notes for the reviewer
