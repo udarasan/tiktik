@@ -77,5 +77,6 @@ npx playwright test
 - Work **one milestone at a time** (docs/MILESTONES.md). Start by giving a short plan: files, migrations, tests. Then implement in small, reviewable steps.
 - Before calling a step done, run `supabase db reset && supabase test db`, lint, typecheck and unit tests, and run `supabase db advisors`. Fix what they find.
 - Commit per logical step, using Conventional Commits and requirement IDs: `feat(tasks): move_task RPC with version check (FR-VIS-03)`.
+- Follow the git workflow in `CONTRIBUTING.md`: never commit to `main`; work on `<type>/m<N>-<slug>` branches, open a PR into `main` per step (squash merge), never edit a merged migration, and tag `v0.N.0` when milestone N's Definition of Done is met.
 - At the end of a session, update `docs/PROGRESS.md`: what was done, any requirement IDs that changed status, open questions.
 - If the plan is ambiguous or contradicts itself, ask. Don't guess on authorization or data-isolation questions.
