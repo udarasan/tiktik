@@ -1,0 +1,7 @@
+node_modules/
+dist/
+coverage/
+package-lock.json
+backend/supabase/.temp/
+docs/TICKR_PLAN.md
+*.sql

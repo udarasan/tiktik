@@ -4,7 +4,7 @@ Tickr is a lightweight team project and task manager (Workspace → Project → 
 
 ## Source of truth
 
-- **`docs/TICKR_PLAN.md`** is the full spec: requirements (FR-*), business rules (BR-*), roles, schema, API contract, NFRs, roadmap and ADRs. Read the relevant sections before working on a milestone. Do not redesign what the plan already decides; if something looks wrong or missing, stop and ask.
+- **`docs/TICKR_PLAN.md`** is the full spec: requirements (FR-_), business rules (BR-_), roles, schema, API contract, NFRs, roadmap and ADRs. Read the relevant sections before working on a milestone. Do not redesign what the plan already decides; if something looks wrong or missing, stop and ask.
 - **`docs/MILESTONES.md`** says what to build in each milestone and when it counts as done.
 - **`docs/PROGRESS.md`** tracks status. Update it at the end of every working session.
 
