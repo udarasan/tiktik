@@ -2,17 +2,17 @@
 
 Update this at the end of every working session.
 
-| Milestone | Status | Notes |
-| --- | --- | --- |
-| M1 Project setup and architecture | Not started | |
-| M2 Authentication and profiles | Not started | |
-| M3 Workspace management | Not started | |
-| M4 Project management | Not started | |
-| M5 Task management | Not started | |
-| M6 List and Kanban views | Not started | |
-| M7 Dashboard and collaboration | Not started | |
-| M8 Testing and QA | Not started | |
-| M9 Deployment | Not started | |
+| Milestone                         | Status      | Notes |
+| --------------------------------- | ----------- | ----- |
+| M1 Project setup and architecture | Not started |       |
+| M2 Authentication and profiles    | Not started |       |
+| M3 Workspace management           | Not started |       |
+| M4 Project management             | Not started |       |
+| M5 Task management                | Not started |       |
+| M6 List and Kanban views          | Not started |       |
+| M7 Dashboard and collaboration    | Not started |       |
+| M8 Testing and QA                 | Not started |       |
+| M9 Deployment                     | Not started |       |
 
 ## Session log
 

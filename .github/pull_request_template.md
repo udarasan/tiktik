@@ -11,13 +11,13 @@ Requirement IDs: <!-- FR-..., BR-..., NFR-... or "none" -->
 ## Changes
 
 **Backend**
-- 
+-
 
 **Frontend**
-- 
+-
 
 **Repo / docs / CI**
-- 
+-
 
 ## How to test
 
@@ -27,7 +27,7 @@ Requirement IDs: <!-- FR-..., BR-..., NFR-... or "none" -->
 
 ## Risks and follow-ups
 
-- 
+-
 
 ## Checklist
 
@@ -35,6 +35,7 @@ Requirement IDs: <!-- FR-..., BR-..., NFR-... or "none" -->
 - [ ] CHANGELOG `[Unreleased]` updated for each part touched
 
 **Backend**
+
 - [ ] `supabase db reset && supabase test db` green; `supabase db advisors` clean
 - [ ] New/changed tables: RLS + matrix tests across two workspaces
 - [ ] New RPCs: success test + one test per error code
@@ -42,9 +43,9 @@ Requirement IDs: <!-- FR-..., BR-..., NFR-... or "none" -->
 - [ ] No merged migration edited; `npm run db:types` run and committed
 
 **Frontend**
+
 - [ ] `lint`, `typecheck`, `test` green
 - [ ] Supabase calls only in `features/*/api`; errors via `toAppError()`
 - [ ] Changelog notes minimum backend version if it needs a new one
 
 - [ ] No secrets committed; `docs/PROGRESS.md` updated if the session ends here
-

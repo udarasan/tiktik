@@ -2,11 +2,11 @@
 
 One repository, two independently released parts:
 
-| Part | Folder | Tags | Deploys to |
-| --- | --- | --- | --- |
-| Backend (Supabase: migrations, RPCs, Edge Functions, pgTAP) | `backend/` | `backend-vX.Y.Z` | Supabase staging / production |
-| Frontend (Vite React SPA) | `frontend/` | `frontend-vX.Y.Z` | Static hosting staging / production |
-| Shared DB types (generated) | `packages/db-types/` | versioned with backend | — |
+| Part                                                        | Folder               | Tags                   | Deploys to                          |
+| ----------------------------------------------------------- | -------------------- | ---------------------- | ----------------------------------- |
+| Backend (Supabase: migrations, RPCs, Edge Functions, pgTAP) | `backend/`           | `backend-vX.Y.Z`       | Supabase staging / production       |
+| Frontend (Vite React SPA)                                   | `frontend/`          | `frontend-vX.Y.Z`      | Static hosting staging / production |
+| Shared DB types (generated)                                 | `packages/db-types/` | versioned with backend | —                                   |
 
 Branching is **develop + main**: day-to-day work lands on `develop` (→ staging); `main` only receives releases (→ production).
 
@@ -14,13 +14,13 @@ Branching is **develop + main**: day-to-day work lands on `develop` (→ staging
 
 ## Branches
 
-| Branch | From | Merges into | Purpose |
-| --- | --- | --- | --- |
-| `main` | — | — | Released code only. Every commit on `main` is tagged. Protected. |
-| `develop` | `main` | `main` (via release PR) | Integration branch, always green. CI deploys it to staging. Protected. Default branch on GitHub. |
-| `<type>/<area>-m<N>-<slug>` | `develop` | `develop` | One logical step. Short-lived (≤ 1–2 days, ≲ 400 changed lines excluding generated files). |
-| `release/<area>-vX.Y.Z` | `develop` | `main`, then back into `develop` | Freeze, bump versions, finalise changelog. |
-| `hotfix/<area>-<slug>` | `main` | `main`, then back into `develop` | Urgent production fix; patch version bump. |
+| Branch                      | From      | Merges into                      | Purpose                                                                                          |
+| --------------------------- | --------- | -------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `main`                      | —         | —                                | Released code only. Every commit on `main` is tagged. Protected.                                 |
+| `develop`                   | `main`    | `main` (via release PR)          | Integration branch, always green. CI deploys it to staging. Protected. Default branch on GitHub. |
+| `<type>/<area>-m<N>-<slug>` | `develop` | `develop`                        | One logical step. Short-lived (≤ 1–2 days, ≲ 400 changed lines excluding generated files).       |
+| `release/<area>-vX.Y.Z`     | `develop` | `main`, then back into `develop` | Freeze, bump versions, finalise changelog.                                                       |
+| `hotfix/<area>-<slug>`      | `main`    | `main`, then back into `develop` | Urgent production fix; patch version bump.                                                       |
 
 **Area** — which part the branch touches:
 
@@ -66,26 +66,26 @@ Title format (it becomes the squash commit, so it must read well in `git log`):
 ```
 
 - ≤ 72 characters, imperative ("add", not "added"), no trailing period.
-- Say *what* changes, not *which milestone*: the milestone is linked separately.
+- Say _what_ changes, not _which milestone_: the milestone is linked separately.
 - Include requirement IDs when the PR implements or tests them.
 
-| Weak | Better |
-| --- | --- |
-| `M1 setup` | `chore(be): init Supabase stack with private schema and extensions` |
-| `fix bug` | `fix(be/workspace): block removing the last Owner (BR-01)` |
+| Weak          | Better                                                                 |
+| ------------- | ---------------------------------------------------------------------- |
+| `M1 setup`    | `chore(be): init Supabase stack with private schema and extensions`    |
+| `fix bug`     | `fix(be/workspace): block removing the last Owner (BR-01)`             |
 | `board stuff` | `feat(fe/board): drag tasks between columns with rollback (FR-VIS-04)` |
-| `update docs` | `docs(repo): document develop/main release and hotfix flow` |
+| `update docs` | `docs(repo): document develop/main release and hotfix flow`            |
 
 The description follows the PR template: **Summary** (2–4 bullets of outcomes), **Changes** grouped by backend / frontend / repo with file paths, **How to test** (exact commands), **Risks and follow-ups**, and the checklist.
 
 ## CI (path-filtered)
 
-| Workflow | Runs when | Jobs |
-| --- | --- | --- |
-| `backend.yml` | `backend/**`, `packages/db-types/**` change | `supabase start` → `db reset` → `test db` → `db advisors` → **types drift check** (regenerate types, fail if they differ from the committed `packages/db-types`) |
-| `frontend.yml` | `frontend/**`, `packages/db-types/**` change | lint, typecheck, Vitest, build; Playwright against a local stack (from M2) |
-| `deploy-staging.yml` | push to `develop` | deploy changed part(s) to staging (skips until staging secrets exist) |
-| `release.yml` | `backend-v*` / `frontend-v*` tag on `main` | deploy that part to production (added in M9) |
+| Workflow             | Runs when                                    | Jobs                                                                                                                                                             |
+| -------------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `backend.yml`        | `backend/**`, `packages/db-types/**` change  | `supabase start` → `db reset` → `test db` → `db advisors` → **types drift check** (regenerate types, fail if they differ from the committed `packages/db-types`) |
+| `frontend.yml`       | `frontend/**`, `packages/db-types/**` change | lint, typecheck, Vitest, build; Playwright against a local stack (from M2)                                                                                       |
+| `deploy-staging.yml` | push to `develop`                            | deploy changed part(s) to staging (skips until staging secrets exist)                                                                                            |
+| `release.yml`        | `backend-v*` / `frontend-v*` tag on `main`   | deploy that part to production (added in M9)                                                                                                                     |
 
 Required status checks use an always-running summary job per workflow, so path-skipped workflows don't block merges.
 
@@ -102,11 +102,11 @@ Release order is always **backend first, then frontend**. So:
 
 Independent SemVer per part, with milestone mapping while pre-1.0:
 
-| Version | Meaning |
-| --- | --- |
-| `0.N.0` | Milestone N's Definition of Done met for that part (e.g. `backend-v0.1.0`, `frontend-v0.1.0` for M1) |
-| `0.N.x` | Fixes within / after milestone N |
-| `1.0.0` | M9 production launch |
+| Version   | Meaning                                                                                                |
+| --------- | ------------------------------------------------------------------------------------------------------ |
+| `0.N.0`   | Milestone N's Definition of Done met for that part (e.g. `backend-v0.1.0`, `frontend-v0.1.0` for M1)   |
+| `0.N.x`   | Fixes within / after milestone N                                                                       |
+| `1.0.0`   | M9 production launch                                                                                   |
 | after 1.0 | major = breaking contract (backend) or removed feature, minor = features / Should-Haves, patch = fixes |
 
 ## Releasing (develop → main)
