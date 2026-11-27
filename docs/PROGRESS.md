@@ -18,6 +18,8 @@ Update this at the end of every working session.
 
 <!-- YYYY-MM-DD — milestone — what was done — requirement IDs completed — open questions -->
 
+- 2026-11-27 — pre-M1 — Imported project kit; chose monorepo with separate `backend/` and `frontend/` (independent SemVer tags, path-filtered CI, shared `packages/db-types`) and develop + main branching (develop → staging, release tags on main → production). See CONTRIBUTING.md.
+
 ## Launch checklist (collected during development)
 
 - [ ] Custom SMTP configured in production Auth settings
@@ -28,3 +30,5 @@ Update this at the end of every working session.
 
 ## Open questions
 
+- Plan §13.4 says staging is fed by `main`; changed to `develop` (decision 2026-11-27). Plan text not edited.
+- Repository layout in plan §13.3 / M1 prompt (`app/`, `supabase/`) superseded by `frontend/`, `backend/supabase/`, `packages/db-types/` (CLAUDE.md).

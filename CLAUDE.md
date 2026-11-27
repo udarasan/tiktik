@@ -18,8 +18,18 @@ Key sections: §4 requirements · §5 roles/permissions/business rules · §7 ar
 
 ## Repository layout
 
+Monorepo with two independently versioned parts. They share only the generated DB types package.
+
 ```
-app/                      # Vite React SPA
+backend/                  # Supabase project (own CI, CHANGELOG, tags backend-vX.Y.Z)
+  supabase/
+    config.toml
+    migrations/           # <timestamp>_<module>_<change>.sql
+    functions/            # Edge Functions (send-invitations, ...)
+    tests/                # pgTAP: *_test.sql
+    seed.sql
+  CHANGELOG.md
+frontend/                 # Vite React SPA (own CI, CHANGELOG, tags frontend-vX.Y.Z)
   src/
     features/<module>/    # auth, workspaces, projects, tasks, board, dashboard, notifications
       api/                # ALL Supabase calls live here (typed wrappers)
@@ -28,14 +38,16 @@ app/                      # Vite React SPA
     components/ui/        # shadcn/ui components
     lib/supabase.ts       # single client instance
     lib/errors.ts         # toAppError()
-    types/database.ts     # generated: supabase gen types typescript --local
-supabase/
-  migrations/             # <timestamp>_<module>_<change>.sql
-  functions/              # Edge Functions (send-invitations, ...)
-  tests/                  # pgTAP: *_test.sql
-  seed.sql
+  CHANGELOG.md
+packages/
+  db-types/               # @tickr/db-types: generated from backend, imported by frontend
+    src/database.ts       # generated: supabase gen types typescript --local (never hand-edit)
 docs/
+.github/workflows/        # backend.yml, frontend.yml (path-filtered), release workflows
+package.json              # npm workspaces: frontend, packages/*
 ```
+
+Boundary rules: `frontend/` never imports from `backend/`; it sees the database only through `@tickr/db-types` and supabase-js. Backend changes must stay backward compatible with the currently released frontend (expand → migrate → contract), because the backend is released first.
 
 ## Non-negotiable rules
 
@@ -47,7 +59,7 @@ docs/
 6. RPCs raise coded errors: `raise exception 'CODE' using errcode = 'P0001'`. Codes are listed in plan §9.1. The frontend maps every error through `toAppError()`.
 7. Every tenant table has `workspace_id`; composite FKs as in plan §8.4. Index every column an RLS policy filters on; wrap helper calls in `(select ...)`.
 8. **Browser gets the publishable key only.** The secret key exists only in Edge Function secrets. Never use legacy `anon` / `service_role` keys.
-9. Schema changes only via migrations (`supabase migration new`). Never edit the remote DB by hand. Regenerate types after every migration.
+9. Schema changes only via migrations (`supabase migration new`). Never edit the remote DB by hand. Regenerate types (`npm run db:types`) after every migration, in the same PR.
 10. Components never call Supabase directly; they go through `features/*/api`.
 11. Do not add features, tables, dependencies or services that the plan doesn't list (no subtasks, Gantt, automation, AI, attachments in v1). If one seems needed, ask first.
 
@@ -61,15 +73,18 @@ docs/
 ## Commands
 
 ```bash
+# backend (run from backend/)
 supabase start                      # local stack
 supabase db reset                   # rebuild from migrations + seed
 supabase migration new <module>_<change>
 supabase test db                    # pgTAP
 supabase db advisors                # security/performance checks
-supabase gen types typescript --local > app/src/types/database.ts
 supabase functions serve            # local Edge Functions
-cd app && npm run dev | npm test | npm run lint | npm run typecheck
-npx playwright test
+
+# from repo root
+npm run db:types                    # regenerate packages/db-types/src/database.ts from the local stack
+npm run dev -w frontend | npm test -w frontend | npm run lint -w frontend | npm run typecheck -w frontend
+npx playwright test -c frontend
 ```
 
 ## How to work
@@ -77,6 +92,6 @@ npx playwright test
 - Work **one milestone at a time** (docs/MILESTONES.md). Start by giving a short plan: files, migrations, tests. Then implement in small, reviewable steps.
 - Before calling a step done, run `supabase db reset && supabase test db`, lint, typecheck and unit tests, and run `supabase db advisors`. Fix what they find.
 - Commit per logical step, using Conventional Commits and requirement IDs: `feat(tasks): move_task RPC with version check (FR-VIS-03)`.
-- Follow the git workflow in `CONTRIBUTING.md`: never commit to `main`; work on `<type>/m<N>-<slug>` branches, open a PR into `main` per step (squash merge), never edit a merged migration, and tag `v0.N.0` when milestone N's Definition of Done is met.
+- Follow the git workflow in `CONTRIBUTING.md`: never commit to `main` or `develop`; branch from `develop` as `<type>/<be|fe|full>-m<N>-<slug>`, open a PR into `develop` per step (squash merge), never edit a merged migration, add a line under `## [Unreleased]` in the affected `CHANGELOG.md`, and keep backend changes backward compatible with the released frontend.
 - At the end of a session, update `docs/PROGRESS.md`: what was done, any requirement IDs that changed status, open questions.
 - If the plan is ambiguous or contradicts itself, ask. Don't guess on authorization or data-isolation questions.

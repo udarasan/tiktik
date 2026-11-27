@@ -1,73 +1,120 @@
 # Contributing to Tickr — Git workflow
 
-Trunk-based development with short-lived branches, pull requests into `main`, and SemVer tags per milestone. This matches plan §13.4: `main` feeds **staging**, tags feed **production**.
+One repository, two independently released parts:
+
+| Part | Folder | Tags | Deploys to |
+| --- | --- | --- | --- |
+| Backend (Supabase: migrations, RPCs, Edge Functions, pgTAP) | `backend/` | `backend-vX.Y.Z` | Supabase staging / production |
+| Frontend (Vite React SPA) | `frontend/` | `frontend-vX.Y.Z` | Static hosting staging / production |
+| Shared DB types (generated) | `packages/db-types/` | versioned with backend | — |
+
+Branching is **develop + main**: day-to-day work lands on `develop` (→ staging); `main` only receives releases (→ production).
+
+> This replaces plan §13.4's "staging fed by `main`": staging is fed by `develop`, production by release tags on `main`.
 
 ## Branches
 
-| Branch | Purpose | Rules |
-| --- | --- | --- |
-| `main` | Always green and deployable; CI deploys it to staging (from M9) | Protected. No direct pushes. Merge only through a PR with CI green. Squash merge. |
-| `<type>/m<N>-<slug>` | One logical step of a milestone | Branch from up-to-date `main`. Aim for < 1–2 days of work and < ~400 changed lines (generated files excluded). Delete after merge. |
-| `fix/<slug>` | Bug fix (incl. hotfixes after a release) | Same as above; a hotfix gets a patch tag after merge. |
+| Branch | From | Merges into | Purpose |
+| --- | --- | --- | --- |
+| `main` | — | — | Released code only. Every commit on `main` is tagged. Protected. |
+| `develop` | `main` | `main` (via release PR) | Integration branch, always green. CI deploys it to staging. Protected. Default branch on GitHub. |
+| `<type>/<area>-m<N>-<slug>` | `develop` | `develop` | One logical step. Short-lived (≤ 1–2 days, ≲ 400 changed lines excluding generated files). |
+| `release/<area>-vX.Y.Z` | `develop` | `main`, then back into `develop` | Freeze, bump versions, finalise changelog. |
+| `hotfix/<area>-<slug>` | `main` | `main`, then back into `develop` | Urgent production fix; patch version bump. |
 
-No long-lived `develop` or `release/*` branches.
+**Area** — which part the branch touches:
 
-**Types** (same as Conventional Commits): `feat`, `fix`, `chore`, `docs`, `test`, `ci`, `refactor`, `perf`, `build`.
+- `be` — only `backend/` (and regenerated `packages/db-types/`)
+- `fe` — only `frontend/`
+- `full` — both, when a feature needs a schema change and its UI in one reviewable unit (keep these rare; prefer a `be` PR first, then `fe`)
+- `repo` — tooling, CI, docs at the root
 
-Examples: `chore/m1-scaffold-app`, `feat/m1-to-app-error`, `ci/m1-github-actions`, `feat/m3-accept-invitation`, `fix/board-rank-collision`.
+**Type** (Conventional Commits): `feat`, `fix`, `chore`, `docs`, `test`, `ci`, `refactor`, `perf`, `build`.
+
+Examples: `chore/be-m1-supabase-init`, `feat/fe-m1-app-shell`, `ci/repo-m1-workflows`, `feat/full-m3-invitations`, `hotfix/be-accept-invitation-expiry`.
 
 ## Commits
 
-Conventional Commits, with the module as scope and requirement IDs where they apply:
+Conventional Commits; scope = `backend`/`frontend` area or module, plus requirement IDs:
 
 ```
-feat(tasks): move_task RPC with version check (FR-VIS-03)
-fix(workspace): block removing the last Owner (BR-01)
-test(rls): two-workspace isolation for task_comments (FR-COL-01)
+feat(be/tasks): move_task RPC with version check (FR-VIS-03)
+feat(fe/board): optimistic drag with rollback toast (FR-VIS-04)
+fix(be/workspace): block removing the last Owner (BR-01)
+ci(repo): path-filtered backend and frontend workflows
 ```
 
-- Commit per logical step; keep each commit buildable.
-- Breaking change to a public RPC/table contract: add `!` (`feat(tasks)!: ...`) and a `BREAKING CHANGE:` footer.
-- Never commit `.env*` files, keys or tokens.
+- Commit per logical step; each commit builds.
+- A breaking change to an RPC/table/view contract: `feat(be/tasks)!: ...` + `BREAKING CHANGE:` footer → **major** bump for backend (see compatibility rules).
+- Never commit `.env*`, keys or tokens.
 
-## Pull requests
+## Pull requests (feature work)
 
-1. `git switch main && git pull --rebase && git switch -c <branch>`
-2. Push and open a PR into `main` using the template. Title = the squash commit message (Conventional Commit + IDs).
-3. Link the PR to its GitHub milestone (`M1` … `M9`).
-4. Keep the branch current with `git rebase main` (not merge commits). Force-push only your own branch, with `--force-with-lease`.
-5. Squash merge once CI is green and review is done; delete the branch.
+1. `git switch develop && git pull --rebase && git switch -c feat/be-m1-private-schema`
+2. Push, open a PR **into `develop`** using the template. PR title = the squash commit message.
+3. Add a line under `## [Unreleased]` in `backend/CHANGELOG.md` and/or `frontend/CHANGELOG.md`.
+4. Link the PR to its GitHub milestone (`M1` … `M9`) and label it `backend` / `frontend`.
+5. Keep current with `git rebase develop`; force-push only your own branch, with `--force-with-lease`.
+6. **Squash merge** once CI is green and reviewed; branch auto-deletes.
 
-### Migrations in PRs
+## CI (path-filtered)
 
-- Never edit a migration that has been merged to `main`; add a new one.
-- If two branches add migrations, the one merged second must rebase and make sure its timestamp sorts after the other's (rename the file if needed), then re-run `supabase db reset && supabase test db`.
-- Regenerate `app/src/types/database.ts` in the same PR as the migration.
+| Workflow | Runs when | Jobs |
+| --- | --- | --- |
+| `backend.yml` | `backend/**`, `packages/db-types/**` change | `supabase start` → `db reset` → `test db` → `db advisors` → **types drift check** (regenerate types, fail if they differ from the committed `packages/db-types`) |
+| `frontend.yml` | `frontend/**`, `packages/db-types/**` change | lint, typecheck, Vitest, build; Playwright against a local stack (from M2) |
+| `deploy-staging.yml` | push to `develop` | deploy changed part(s) to staging (skips until staging secrets exist) |
+| `release.yml` | `backend-v*` / `frontend-v*` tag on `main` | deploy that part to production (added in M9) |
 
-## Releases and versions
+Required status checks use an always-running summary job per workflow, so path-skipped workflows don't block merges.
 
-SemVer tags on `main`, annotated, with notes from the merged PRs:
+## Backend ↔ frontend compatibility
 
-| Tag | When |
+Release order is always **backend first, then frontend**. So:
+
+- Backend changes must keep working with the **currently released** frontend. Use **expand → migrate → contract**: add new columns/RPCs first; switch the frontend; remove old ones in a later backend release.
+- Never edit a migration that is on `develop`; add a new one. If two open PRs add migrations, the later one rebases and renames its file so its timestamp sorts last, then re-runs `supabase db reset && supabase test db`.
+- Regenerate `packages/db-types` in the same PR as the migration (`npm run db:types`); CI fails on drift.
+- Each frontend release notes the minimum backend version it needs in its changelog (`Requires: backend >= 0.3.0`).
+
+## Versions
+
+Independent SemVer per part, with milestone mapping while pre-1.0:
+
+| Version | Meaning |
 | --- | --- |
-| `v0.1.0` … `v0.8.0` | End of milestone M1 … M8 (Definition of Done met) |
-| `v0.N.x` | Fixes after a milestone tag |
-| `v1.0.0` | M9 launch to production |
-| `v1.x.y` | After launch: minor = Should-Haves / features, patch = fixes |
+| `0.N.0` | Milestone N's Definition of Done met for that part (e.g. `backend-v0.1.0`, `frontend-v0.1.0` for M1) |
+| `0.N.x` | Fixes within / after milestone N |
+| `1.0.0` | M9 production launch |
+| after 1.0 | major = breaking contract (backend) or removed feature, minor = features / Should-Haves, patch = fixes |
+
+## Releasing (develop → main)
 
 ```bash
-git switch main && git pull --rebase
-git tag -a v0.1.0 -m "M1: project setup and architecture"
-git push origin v0.1.0
+git switch develop && git pull --rebase
+git switch -c release/backend-v0.1.0
+# bump backend version, move [Unreleased] → [0.1.0] - YYYY-MM-DD in backend/CHANGELOG.md
+git commit -am "chore(release): backend v0.1.0"
+git push -u origin release/backend-v0.1.0
+# PR into main → merge with a MERGE COMMIT (not squash), then:
+git switch main && git pull
+git tag -a backend-v0.1.0 -m "backend v0.1.0 — M1"
+git push origin backend-v0.1.0
+# back-merge so develop contains the release commit:
+git switch develop && git merge --no-ff main && git push
 ```
 
-Production deploys run only from a `v*` tag (workflow added in M9). Staging deploys from `main`.
+Releasing both parts together: one `release/m1` branch, both changelogs bumped, two tags (backend tag first).
 
-## Branch protection for `main` (set once in GitHub → Settings → Branches)
+## Hotfixes
 
-- Require a pull request before merging (1 approval when there is more than one developer).
-- Require status checks to pass: the CI workflow's jobs (lint, typecheck, unit tests, `supabase test db`).
-- Require branches to be up to date before merging.
-- Require linear history; allow squash merge only.
-- Block force pushes and deletions.
-- Automatically delete head branches after merge.
+Branch `hotfix/<area>-<slug>` from `main` → PR into `main` (merge commit) → patch tag → back-merge `main` into `develop`.
+
+## GitHub settings (one-time)
+
+- Default branch: `develop`.
+- `develop` protection: PR required, status checks (`backend / summary`, `frontend / summary`) required, up-to-date required, squash merge only, no force pushes or deletion.
+- `main` protection: PR required, status checks required, only `release/*` and `hotfix/*` PRs, merge commits allowed, no force pushes or deletion.
+- Auto-delete head branches after merge.
+- Labels: `backend`, `frontend`, `repo`; milestones `M1` … `M9`.
+- `CODEOWNERS` routes `backend/` and `frontend/` reviews (update as the team grows).
