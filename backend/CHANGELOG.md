@@ -12,7 +12,15 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
   - RLS helpers in `private`: `my_workspace_ids(min_role)`, `workspace_role(ws)`, `my_teammate_ids()`, `role_rank()`.
   - RLS: members see their workspaces and member lists; only Owner/Admin see invitations and audit events; only Owner/Admin may update a workspace's name and description, which is audited by a trigger (FR-WS-02). All other writes are reserved for RPCs. `invitations.token_hash` is not selectable (BR-13).
   - Profiles: a single select policy, "self or teammate" (plan §9.3), replacing `profiles_select_self`.
-- pgTAP: shared helpers (`tests` schema, test DB only) with two-workspace fixtures; `020_workspace_rls_test.sql` (78 assertions): a visibility matrix for 9 personas across 5 tables, write privileges, the audit trigger, soft delete and the §8.4 constraints.
+- Workspace RPCs (migration `workspace_rpcs`, plan §9.4–9.5), all `security definer` with coded errors and audit entries:
+  - `create_workspace(name)` → `{ id, name, slug }`: name 2–60, unique URL slug (random suffix on collision), creator becomes Owner (FR-WS-01).
+  - `update_member_role(ws, user, role)`: Owner changes anyone except the Owner; Admins may only demote themselves; only the Owner promotes to or demotes from Admin (FR-WS-08, BR-01, BR-02, §5.5).
+  - `remove_workspace_member(ws, user)`: Owner removes Admins and Members; Admin removes Members; the Owner can never be removed (FR-WS-09).
+  - `leave_workspace(ws)`: not for the Owner (FR-WS-10).
+  - `transfer_ownership(ws, new_owner)`: to an active Admin only; the previous Owner becomes Admin (FR-WS-11).
+  - Non-members get `NOT_FOUND` (ADR-11); targets that aren't active members get `NOT_WORKSPACE_MEMBER`.
+  - `private.handle_member_departure()` hook for project memberships (M4) and task unassignment (M5).
+- pgTAP: shared helpers (`tests` schema, test DB only) with two-workspace fixtures; `020_workspace_rls_test.sql` (78 assertions): a visibility matrix for 9 personas across 5 tables, write privileges, the audit trigger, soft delete and the §8.4 constraints; `030`–`033` (65 assertions): every RPC's success path and each error code, following the §5.2 permission matrix.
 
 ## [0.2.0] - 2026-11-28
 
