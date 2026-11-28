@@ -8,6 +8,7 @@ import { LoginPage } from '@/pages/auth/LoginPage';
 import { RegisterPage } from '@/pages/auth/RegisterPage';
 import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { MePage } from '@/pages/MePage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 // Plan §7.11, §11.2–11.3. /w/:slug (M3) and /w/:slug/p/:key (M4+) arrive later.
@@ -33,6 +34,8 @@ export const routes: RouteObject[] = [
         element: <AppShell />,
         children: [
           { index: true, element: <DashboardPage /> },
+          // Moves to /w/:slug/me in M3 (plan §11.3).
+          { path: 'me', element: <MePage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

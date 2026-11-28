@@ -84,6 +84,23 @@ export async function setNewPassword(password: string): Promise<void> {
   if (error) throw toAppError(error);
 }
 
+/**
+ * FR-AUTH-05: change password while signed in. Supabase Auth checks the current password
+ * (`require_current_password`), then all OTHER sessions are signed out.
+ */
+export async function changePassword(input: {
+  currentPassword: string;
+  newPassword: string;
+}): Promise<void> {
+  const { error } = await supabase.auth.updateUser({
+    password: input.newPassword,
+    current_password: input.currentPassword,
+  });
+  if (error) throw toAppError(error);
+  const { error: revokeError } = await supabase.auth.signOut({ scope: 'others' });
+  if (revokeError) throw toAppError(revokeError);
+}
+
 export async function getSession(): Promise<Session | null> {
   const { data, error } = await supabase.auth.getSession();
   if (error) throw toAppError(error);

@@ -58,3 +58,20 @@ export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
 export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 export type NewPasswordValues = z.infer<typeof newPasswordSchema>;
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Enter your current password'),
+    newPassword: passwordSchema,
+    confirm: z.string(),
+  })
+  .refine((v) => v.newPassword === v.confirm, {
+    error: 'Passwords do not match',
+    path: ['confirm'],
+  })
+  .refine((v) => v.newPassword !== v.currentPassword, {
+    error: 'Choose a different password from your current one',
+    path: ['newPassword'],
+  });
+
+export type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
