@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { waitForEmailLink } from './support/mailpit';
+import { requestPasswordReset } from './support/reset';
 import {
   createConfirmedUser,
   E2E_NEW_PASSWORD,
@@ -105,9 +106,7 @@ test.describe('FR-AUTH-06 password reset', () => {
 
     await page.goto('/login');
     await page.getByRole('link', { name: 'Forgot password?' }).click();
-    await page.getByLabel('Email', { exact: true }).fill(user.email);
-    await page.getByRole('button', { name: 'Send reset link' }).click();
-    await expect(page.getByText(`If an account exists for ${user.email}`)).toBeVisible();
+    await requestPasswordReset(page, user.email);
 
     const link = await waitForEmailLink(user.email, 'Reset');
     expect(link).toMatch(/\/reset-password\?token_hash=[^&]+&type=recovery$/);
@@ -135,8 +134,6 @@ test.describe('FR-AUTH-06 password reset', () => {
   test('the response does not reveal whether an account exists', async ({ page }) => {
     await page.goto('/forgot-password');
     const email = newUser().email; // never registered
-    await page.getByLabel('Email', { exact: true }).fill(email);
-    await page.getByRole('button', { name: 'Send reset link' }).click();
-    await expect(page.getByText(`If an account exists for ${email}`)).toBeVisible();
+    await requestPasswordReset(page, email);
   });
 });
