@@ -4,6 +4,16 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
 
 ## [Unreleased]
 
+### Added
+
+- Migration `workspace_core` (M3, plan §8.2, §8.4–8.6):
+  - Tables `workspaces` (name 2–60, unique slug, description ≤ 500, `owner_id`, soft delete), `workspace_members` (`OWNER`/`ADMIN`/`MEMBER`, `ACTIVE`/`REMOVED`), `invitations` (citext email, `ADMIN`/`MEMBER`, hashed token, 7-day expiry) and `audit_events`.
+  - BR-01: a partial unique index allows exactly one active Owner. FR-WS-04: one pending invitation per email per workspace, case-insensitive. Indexes from §8.5.
+  - RLS helpers in `private`: `my_workspace_ids(min_role)`, `workspace_role(ws)`, `my_teammate_ids()`, `role_rank()`.
+  - RLS: members see their workspaces and member lists; only Owner/Admin see invitations and audit events; only Owner/Admin may update a workspace's name and description, which is audited by a trigger (FR-WS-02). All other writes are reserved for RPCs. `invitations.token_hash` is not selectable (BR-13).
+  - Profiles: a single select policy, "self or teammate" (plan §9.3), replacing `profiles_select_self`.
+- pgTAP: shared helpers (`tests` schema, test DB only) with two-workspace fixtures; `020_workspace_rls_test.sql` (78 assertions): a visibility matrix for 9 personas across 5 tables, write privileges, the audit trigger, soft delete and the §8.4 constraints.
+
 ## [0.2.0] - 2026-11-28
 
 M2 — authentication and profiles.
