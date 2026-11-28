@@ -20,7 +20,15 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
   - `transfer_ownership(ws, new_owner)`: to an active Admin only; the previous Owner becomes Admin (FR-WS-11).
   - Non-members get `NOT_FOUND` (ADR-11); targets that aren't active members get `NOT_WORKSPACE_MEMBER`.
   - `private.handle_member_departure()` hook for project memberships (M4) and task unassignment (M5).
-- pgTAP: shared helpers (`tests` schema, test DB only) with two-workspace fixtures; `020_workspace_rls_test.sql` (78 assertions): a visibility matrix for 9 personas across 5 tables, write privileges, the audit trigger, soft delete and the §8.4 constraints; `030`–`033` (65 assertions): every RPC's success path and each error code, following the §5.2 permission matrix.
+- Invitations (migration `workspace_invitations`, plan §6.2, §9.5; FR-WS-04, 05, 06; BR-13). Strict token model (decision 2026-11-28): raw tokens exist only in the responses of service-role-only functions; the database stores SHA-256 hashes.
+  - `create_invitations(actor, ws, invites)` (service role only): 1–20 invites; one result per email (`CREATED` with token, `ALREADY_MEMBER_OR_INVITED`, `ONLY_OWNER_CAN_INVITE_ADMIN`, `VALIDATION_ERROR`); emails lower-cased; audited.
+  - `reissue_invitation(actor, invitation)` (service role only): new token and a fresh 7-day expiry; the old link stops working (FR-WS-06 resend).
+  - `invitation_email_context(ws, actor)` (service role only): workspace and inviter names for the email.
+  - `revoke_invitation(invitation)`: Owner/Admin; Admin invitations by the Owner only; audited.
+  - `get_invitation_preview(token)`: public; workspace, inviter, email, role; `NOT_FOUND` / `NOT_PENDING` / `INVITATION_EXPIRED`.
+  - `accept_invitation(token)` → `{ workspace_id, slug }`: the signed-in user's confirmed email must match (`EMAIL_MISMATCH`); a removed member is reactivated; an existing member keeps their role and the invitation is marked used (§5.5); audited.
+  - Hourly `pg_cron` job `expire-invitations` (plan §7.3).
+- pgTAP: shared helpers (`tests` schema, test DB only) with two-workspace fixtures; `020_workspace_rls_test.sql` (78 assertions): a visibility matrix for 9 personas across 5 tables, write privileges, the audit trigger, soft delete and the §8.4 constraints; `030`–`033` (65 assertions): every RPC's success path and each error code, following the §5.2 permission matrix; `040_invitations_test.sql` (59 assertions).
 
 ## [0.2.0] - 2026-11-28
 

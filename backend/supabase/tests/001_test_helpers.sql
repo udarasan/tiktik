@@ -5,7 +5,7 @@
 create extension if not exists pgtap with schema extensions;
 
 create schema if not exists tests;
-grant usage on schema tests to anon, authenticated;
+grant usage on schema tests to anon, authenticated, service_role;
 
 -- Deterministic id per fixture name, e.g. tests.uid('a_owner').
 create or replace function tests.uid(name text)
@@ -121,7 +121,7 @@ begin
 end;
 $$;
 
-grant execute on all functions in schema tests to anon, authenticated;
+grant execute on all functions in schema tests to anon, authenticated, service_role;
 
 select plan(1);
 select pass('test helpers installed');
