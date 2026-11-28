@@ -38,7 +38,7 @@ Update this at the end of every working session.
 - Plan §13.4 says staging is fed by `main`; changed to `develop` (decision 2026-11-27). Plan text not edited.
 - Repository layout in plan §13.3 / M1 prompt (`app/`, `supabase/`) superseded by `frontend/`, `backend/supabase/`, `packages/db-types/` (CLAUDE.md).
 - No staging or production Supabase projects yet (plan §13.3 lists them under M1). `deploy-staging.yml` is ready; it needs a staging project and the `staging` environment secrets. Suggest creating staging before M3 (invitations need real email).
-- Branch protection / required checks (`backend-summary`, `frontend-summary`, `repo-format`) still to be enabled in GitHub settings.
+- Branch protection / required checks (`backend-summary`, `frontend-summary`, `e2e-summary`, `repo-format`) still to be enabled in GitHub settings.
 - TypeScript pinned to 6.0 until `typescript-eslint` supports 7 (frontend CHANGELOG).
 - Auth error mapping beyond 429 in `toAppError()` is an interpretation of §9.2 — confirm in M2 (e.g. `email_not_confirmed` → `UNAUTHENTICATED`).
-- Playwright's own browser download did not complete on the dev machine; resolve before M2 E2E tests (CI uses its own runners).
+- Playwright's Chromium download from cdn.playwright.dev stalls on the dev machine; local E2E uses `PLAYWRIGHT_CHANNEL=chrome` (installed Chrome). CI downloads Chromium normally.

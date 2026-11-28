@@ -13,6 +13,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
+    // Unit tests only; Playwright owns e2e/.
+    include: ['src/**/*.test.{ts,tsx}'],
     css: false,
     // Public env for tests; components under test mock features/*/api, so nothing is called.
     env: {

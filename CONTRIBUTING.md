@@ -84,11 +84,12 @@ The description follows the PR template: **Summary** (2–4 bullets of outcomes)
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `backend.yml`        | every PR/push to `develop`/`main`; heavy job only if `backend/**`, `packages/db-types/**` or root `package*.json` change | `supabase start` (database services only) → `db reset` → `test db` → `db advisors --fail-on warn` → **types drift check** (`npm run db:types:check`)   |
 | `frontend.yml`       | same, for `frontend/**`, `packages/db-types/**`, root `package*.json`                                                    | lint, typecheck, Vitest, build (Playwright joins in M2)                                                                                                |
+| `e2e.yml`            | same, for `frontend/**`, `backend/**`, `packages/db-types/**`, root `package*.json`                                      | local Supabase (Auth, API, DB, Mailpit) → `npm run env:local` → Playwright Chromium → `npm run e2e`; HTML report uploaded on failure                   |
 | `repo.yml`           | every PR/push                                                                                                            | `npm run format:check` (Prettier, whole repo)                                                                                                          |
 | `deploy-staging.yml` | push to `develop` touching migrations or functions                                                                       | `supabase link` → `db push --remote` → `functions deploy` → advisors (report only). Skips with a notice until the `staging` environment secrets exist. |
 | `release.yml`        | `backend-v*` / `frontend-v*` tag on `main`                                                                               | deploy that part to production (added in M9)                                                                                                           |
 
-**Required status checks** (branch protection on `develop` and `main`): `backend-summary`, `frontend-summary`, `repo-format`. The summary jobs always run and pass when their part was skipped, so path filtering never blocks a merge.
+**Required status checks** (branch protection on `develop` and `main`): `backend-summary`, `frontend-summary`, `e2e-summary`, `repo-format`. The summary jobs always run and pass when their part was skipped, so path filtering never blocks a merge.
 
 Actions are pinned to commit SHAs (with the version in a comment); Dependabot (`.github/dependabot.yml`) proposes updates weekly into `develop`, for npm and GitHub Actions.
 
@@ -137,7 +138,7 @@ Branch `hotfix/<area>-<slug>` from `main` → PR into `main` (merge commit) → 
 ## GitHub settings (one-time)
 
 - Default branch: `develop`.
-- `develop` protection: PR required, status checks (`backend-summary`, `frontend-summary`, `repo-format`) required, up-to-date required, squash merge only, no force pushes or deletion.
+- `develop` protection: PR required, status checks (`backend-summary`, `frontend-summary`, `e2e-summary`, `repo-format`) required, up-to-date required, squash merge only, no force pushes or deletion.
 - `main` protection: PR required, status checks required, only `release/*` and `hotfix/*` PRs, merge commits allowed, no force pushes or deletion.
 - Auto-delete head branches after merge.
 - Labels: `backend`, `frontend`, `repo`; milestones `M1` … `M9`.

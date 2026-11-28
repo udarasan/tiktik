@@ -1,0 +1,103 @@
+# End-to-end tests (Playwright) against a local Supabase stack (plan §10.2, NFR-TST-02).
+# Runs when the frontend, backend or shared types change. Require "e2e-summary" in branch protection.
+name: e2e
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  SUPABASE_CLI_VERSION: 3.4.0
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            app:
+              - 'frontend/**'
+              - 'backend/**'
+              - 'packages/db-types/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/e2e.yml'
+
+  playwright:
+    needs: changes
+    if: needs.changes.outputs.app == 'true' || github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Start local Supabase (Auth, API, database, Mailpit)
+        working-directory: backend
+        run: supabase start -x studio,imgproxy,storage-api,realtime,edge-runtime,logflare,vector,supavisor
+
+      - name: Write frontend/.env.local from the stack
+        run: npm run env:local
+
+      - name: Install Playwright Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E
+        working-directory: frontend
+        run: npm run e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results
+          retention-days: 7
+
+      - name: Stop Supabase
+        if: always()
+        working-directory: backend
+        run: supabase stop --no-backup
+
+  summary:
+    name: e2e-summary
+    if: always()
+    needs: [changes, playwright]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          echo "changes=${{ needs.changes.result }} playwright=${{ needs.playwright.result }}"
+          if [[ "${{ needs.changes.result }}" != "success" ]]; then exit 1; fi
+          if [[ "${{ needs.playwright.result }}" == "failure" || "${{ needs.playwright.result }}" == "cancelled" ]]; then exit 1; fi
