@@ -5,3 +5,4 @@ package-lock.json
 backend/supabase/.temp/
 docs/TICKR_PLAN.md
 *.sql
+backend/supabase/config.jsonc
