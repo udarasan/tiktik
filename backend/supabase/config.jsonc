@@ -12,11 +12,13 @@
     "port": 54321,
     // Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
     // endpoints. `public` and `graphql_public` schemas are included by default.
-    "schemas": ["public", "graphql_public"],
+    // Tickr: GraphQL is not used (plan §10.3), so only `public` is exposed.
+    "schemas": ["public"],
     // Extra schemas to add to the search_path of every request.
     "extra_search_path": ["public", "extensions"],
     // The maximum number of rows returned from a view, table, or stored procedure. Limits payload size
     // for accidental or malicious requests.
+    // Tickr: plan §9.1 pages at most 100 rows; 1000 is the hard ceiling.
     "max_rows": 1000,
     // The maximum number of connections in the local PostgREST database pool. Left unset, the default
     // pool size is unchanged.
@@ -186,18 +188,26 @@
     "enabled": true,
     // The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
     // in emails.
-    "site_url": "http://127.0.0.1:3000",
+    // Tickr: Vite dev server (plan §7.5). Staging/production values are set in the dashboard (docs/PROGRESS.md launch checklist).
+    "site_url": "http://localhost:5173",
     // The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
     // "external_url": "",
     // A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-    "additional_redirect_urls": ["https://127.0.0.1:3000"],
+    "additional_redirect_urls": [
+      "http://localhost:5173/**",
+      "http://127.0.0.1:5173/**",
+      "http://localhost:5174/**",
+      "http://127.0.0.1:5174/**"
+    ],
     // How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
-    "jwt_expiry": 3600,
+    // Tickr FR-AUTH-04: 30-minute access tokens.
+    "jwt_expiry": 1800,
     // JWT issuer URL. If not set, defaults to auth.external_url.
     // "jwt_issuer": "",
     // Path to JWT signing key. DO NOT commit your signing keys file to git.
     // "signing_keys_path": "./signing_keys.json",
     // If disabled, the refresh token will never expire.
+    // Tickr FR-AUTH-04: rotation with reuse detection.
     "enable_refresh_token_rotation": true,
     // Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.
     // Requires enable_refresh_token_rotation = true.
@@ -209,10 +219,12 @@
     // Allow/disallow testing manual linking of accounts
     "enable_manual_linking": false,
     // Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
-    "minimum_password_length": 6,
+    // Tickr FR-AUTH-01: at least 8 characters with a letter and a digit.
+    // (Upper bound: Auth rejects passwords over 72 bytes, the bcrypt limit; the UI enforces 72.)
+    "minimum_password_length": 8,
     // Passwords that do not meet the following requirements will be rejected as weak. Supported values
     // are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
-    "password_requirements": "",
+    "password_requirements": "letters_digits",
 
     // Configure passkey sign-ins.
     // "passkey": {
@@ -244,10 +256,12 @@
     },
 
     // Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
+    // Tickr FR-AUTH-11: Cloudflare Turnstile on sign-up and password reset. Off locally and in CI;
+    // enabled on staging/production in the dashboard with the secret key (docs/PROGRESS.md).
     // "captcha": {
     //   "enabled": true,
-    //   "provider": "hcaptcha",
-    //   "secret": ""
+    //   "provider": "turnstile",
+    //   "secret": "env(SUPABASE_AUTH_CAPTCHA_SECRET)"
     // },
 
     "email": {
@@ -258,18 +272,22 @@
       // addresses. If disabled, only the new email is required to confirm.
       "double_confirm_changes": true,
       // If enabled, users need to confirm their email address before signing in.
-      "enable_confirmations": false,
+      // Tickr FR-AUTH-07 (decision 2026-11-28): sign-in is blocked until the email is confirmed.
+      "enable_confirmations": true,
       // If enabled, users will need to reauthenticate or have logged in recently to change their password.
       "secure_password_change": false,
       // If enabled, users will need to provide their current password to change their password, unless
       // they signed in with a one-time password, magic link, or recovery link.
-      // "require_current_password": true,
+      // Tickr FR-AUTH-05: changing the password requires the current one.
+      "require_current_password": true,
       // Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-      "max_frequency": "1s",
+      // Tickr: at most one confirmation / reset email per minute per address.
+      "max_frequency": "60s",
       // Number of characters used in the email OTP.
       "otp_length": 6,
       // Number of seconds before the email OTP expires (defaults to 1 hour).
-      "otp_expiry": 3600,
+      // Tickr FR-AUTH-06: reset links expire after 30 minutes.
+      "otp_expiry": 1800,
 
       // Use a production-ready SMTP server
       // "smtp": {

@@ -4,6 +4,19 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
 
 ## [Unreleased]
 
+### Changed
+
+- Auth settings in `config.jsonc` for M2:
+  - email confirmation required before sign-in (FR-AUTH-07, decision 2026-11-28);
+  - 30-minute JWTs with refresh-token rotation and reuse detection (FR-AUTH-04);
+  - passwords of at least 8 characters with letters and digits (FR-AUTH-01);
+  - current password required to change it (FR-AUTH-05);
+  - reset and confirmation links expire after 30 minutes (FR-AUTH-06);
+  - at most one auth email per address per minute;
+  - redirect URLs for the Vite dev server;
+  - Turnstile CAPTCHA documented and off locally (FR-AUTH-11).
+- The Data API exposes only `public`; `graphql_public` is removed (plan §10.3). `@tickr/db-types` regenerated without it.
+
 ## [0.1.0] - 2026-11-28
 
 M1 — project setup and architecture.
