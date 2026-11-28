@@ -4,6 +4,14 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-28
+
+M1 — project setup and architecture.
+
+### Changed
+
+- `@tickr/db-types` is referenced as `*` so npm always links the local workspace; an exact version made every backend release break `npm install` and made npm look it up on the public registry.
+
 ### Added
 
 - Vite 8 + React 19 SPA in `frontend/` (npm workspace `@tickr/frontend`), TypeScript 6.0 strict (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`), `@/` path alias.
@@ -32,3 +40,6 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 - Sidebar: "No projects yet" was 8 px out of line with the other items, because Tailwind's `not-sr-only` resets padding.
 - Sidebar: the Collapse button looked permanently pressed (shadcn styles `aria-expanded="true"`).
 - Sidebar: the "+ create project" button still showed in the collapsed rail at ≥ 1024 px, because conflicting `hidden` / `lg:inline-flex` classes were both applied.
+
+[Unreleased]: https://github.com/udarasan/tiktik/compare/frontend-v0.1.0...develop
+[0.1.0]: https://github.com/udarasan/tiktik/releases/tag/frontend-v0.1.0

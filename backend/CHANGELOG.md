@@ -4,6 +4,10 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-28
+
+M1 — project setup and architecture.
+
 ### Added
 
 - Supabase local project in `backend/supabase` (CLI 3.x, `config.jsonc`, Postgres 17, project id `tickr`).
@@ -12,3 +16,6 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
 - Empty `seed.sql`.
 - CI (`.github/workflows/backend.yml`): local stack, `db reset`, pgTAP, advisors (fail on warnings) and the generated-types drift check on every backend change.
 - Staging deploy workflow (`deploy-staging.yml`): links the staging project and runs `db push --remote` and `functions deploy` on pushes to `develop`; skips until staging secrets are configured.
+
+[Unreleased]: https://github.com/udarasan/tiktik/compare/backend-v0.1.0...develop
+[0.1.0]: https://github.com/udarasan/tiktik/releases/tag/backend-v0.1.0

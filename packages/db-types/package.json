@@ -1,6 +1,6 @@
 {
   "name": "@tickr/db-types",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "TypeScript types generated from the Tickr Supabase schema. Do not edit src/database.ts by hand: run `npm run db:types` from the repo root.",
   "type": "module",
