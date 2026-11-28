@@ -4,6 +4,10 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-28
+
+M2 — authentication and profiles.
+
 ### Added
 
 - Playwright E2E suite (`frontend/e2e`, `npm run e2e`), 8 tests against the local Supabase stack, reading emails from Mailpit:
@@ -73,5 +77,6 @@ M1 — project setup and architecture.
 - Sidebar: the Collapse button looked permanently pressed (shadcn styles `aria-expanded="true"`).
 - Sidebar: the "+ create project" button still showed in the collapsed rail at ≥ 1024 px, because conflicting `hidden` / `lg:inline-flex` classes were both applied.
 
-[Unreleased]: https://github.com/udarasan/tiktik/compare/frontend-v0.1.0...develop
+[Unreleased]: https://github.com/udarasan/tiktik/compare/frontend-v0.2.0...develop
+[0.2.0]: https://github.com/udarasan/tiktik/compare/frontend-v0.1.0...frontend-v0.2.0
 [0.1.0]: https://github.com/udarasan/tiktik/releases/tag/frontend-v0.1.0
