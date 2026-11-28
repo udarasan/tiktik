@@ -13,8 +13,8 @@ coverage/
 !.env.example
 
 # Supabase local
-supabase/.branches/
-supabase/.temp/
+**/supabase/.branches/
+**/supabase/.temp/
 
 # Playwright
 test-results/
