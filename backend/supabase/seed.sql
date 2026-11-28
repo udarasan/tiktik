@@ -1,0 +1,2 @@
+-- Local development seed data. Runs after migrations on `supabase db reset`.
+-- Empty in M1: domain tables arrive in M2+ (profiles) and M3+ (workspaces).
