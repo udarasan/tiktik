@@ -26,3 +26,9 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 - Inter variable font and 14 px base text (plan §11.7), replacing shadcn's default Geist.
 - Dashboard and not-found placeholder pages inside the shell.
 - CI (`.github/workflows/frontend.yml`): lint, typecheck, unit tests and build on every frontend change.
+
+### Fixed
+
+- Sidebar: "No projects yet" was 8 px out of line with the other items, because Tailwind's `not-sr-only` resets padding.
+- Sidebar: the Collapse button looked permanently pressed (shadcn styles `aria-expanded="true"`).
+- Sidebar: the "+ create project" button still showed in the collapsed rail at ≥ 1024 px, because conflicting `hidden` / `lg:inline-flex` classes were both applied.

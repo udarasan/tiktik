@@ -57,16 +57,17 @@ export function Sidebar({ variant }: SidebarProps) {
               size="icon-xs"
               disabled
               aria-label="Create project (available in M4)"
-              className={cn(
-                variant === 'rail' && collapsed && 'hidden',
-                variant === 'rail' && 'hidden lg:inline-flex',
-              )}
+              className={cn(variant === 'rail' && (collapsed ? 'hidden' : 'hidden lg:inline-flex'))}
             >
               <Plus />
             </Button>
           </div>
+          {/* Shown/hidden via display, not sr-only: Tailwind's not-sr-only resets padding to 0. */}
           <p
-            className={cn('flex items-center gap-2 px-2 text-xs text-muted-foreground', labelClass)}
+            className={cn(
+              'items-center gap-2 px-2 text-xs text-muted-foreground',
+              variant === 'drawer' ? 'flex' : collapsed ? 'hidden' : 'hidden lg:flex',
+            )}
           >
             <FolderKanban aria-hidden className="size-4 shrink-0" />
             No projects yet
@@ -83,8 +84,8 @@ export function Sidebar({ variant }: SidebarProps) {
           variant="ghost"
           size="sm"
           onClick={toggleSidebar}
+          // No aria-expanded: shadcn styles aria-expanded="true" as pressed; the label states the action.
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          aria-expanded={!collapsed}
           className="hidden justify-start lg:inline-flex"
         >
           {collapsed ? <ChevronsRight /> : <ChevronsLeft />}
