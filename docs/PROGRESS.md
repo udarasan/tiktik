@@ -26,7 +26,10 @@ Update this at the end of every working session.
 
 - [ ] Custom SMTP configured in production Auth settings
 - [ ] Auth rate limits raised to fit expected sign-ups and invitations
-- [ ] CAPTCHA enabled for sign-up and password reset
+- [ ] CAPTCHA enabled for sign-up and password reset: Cloudflare Turnstile; secret key in Auth settings, site key as `VITE_TURNSTILE_SITE_KEY`
+- [ ] Auth settings match `backend/supabase/config.jsonc`: email confirmations on, JWT expiry 1800 s, refresh-token rotation on, minimum password 8 with letters + digits, require current password, OTP expiry 1800 s
+- [ ] Site URL and redirect URLs set to the real staging/production domains (no localhost)
+- [ ] Email templates (confirm sign-up, reset password) branded and pointing at `/auth/confirm`
 - [ ] New publishable/secret API keys in use; legacy keys disabled
 - [ ] Production project on a paid plan (no pausing), backups verified
 
@@ -38,5 +41,4 @@ Update this at the end of every working session.
 - Branch protection / required checks (`backend-summary`, `frontend-summary`, `repo-format`) still to be enabled in GitHub settings.
 - TypeScript pinned to 6.0 until `typescript-eslint` supports 7 (frontend CHANGELOG).
 - Auth error mapping beyond 429 in `toAppError()` is an interpretation of §9.2 — confirm in M2 (e.g. `email_not_confirmed` → `UNAUTHENTICATED`).
-- `config.jsonc` still exposes `graphql_public`; plan §10.3 doesn't use GraphQL — remove in M2 with the Auth settings.
 - Playwright's own browser download did not complete on the dev machine; resolve before M2 E2E tests (CI uses its own runners).
