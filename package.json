@@ -1,0 +1,24 @@
+{
+  "name": "tickr",
+  "private": true,
+  "description": "Tickr — team project and task manager (monorepo: backend/ Supabase, frontend/ Vite React, packages/db-types).",
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22 <23",
+    "npm": ">=10"
+  },
+  "scripts": {
+    "db:types": "supabase gen types typescript --local --workdir backend > packages/db-types/src/database.ts && prettier --write packages/db-types/src/database.ts",
+    "db:types:check": "npm run db:types && git diff --exit-code -- packages/db-types/src/database.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "env:local": "node scripts/write-local-env.mjs"
+  },
+  "devDependencies": {
+    "prettier": "3.10.1"
+  }
+}
