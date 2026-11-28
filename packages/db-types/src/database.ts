@@ -213,9 +213,18 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_invitation: { Args: { p_token: string }; Returns: Json };
+      create_invitations: {
+        Args: { p_actor: string; p_invites: Json; p_ws_id: string };
+        Returns: Json;
+      };
       create_workspace: { Args: { p_name: string }; Returns: Json };
+      get_invitation_preview: { Args: { p_token: string }; Returns: Json };
+      invitation_email_context: { Args: { p_actor: string; p_ws_id: string }; Returns: Json };
       leave_workspace: { Args: { p_ws_id: string }; Returns: undefined };
+      reissue_invitation: { Args: { p_actor: string; p_invitation_id: string }; Returns: Json };
       remove_workspace_member: { Args: { p_user_id: string; p_ws_id: string }; Returns: undefined };
+      revoke_invitation: { Args: { p_invitation_id: string }; Returns: undefined };
       transfer_ownership: { Args: { p_new_owner_id: string; p_ws_id: string }; Returns: undefined };
       update_member_role: {
         Args: { p_role: string; p_user_id: string; p_ws_id: string };
