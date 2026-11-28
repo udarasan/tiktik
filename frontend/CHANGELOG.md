@@ -4,6 +4,24 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+### Added
+
+- Auth pages (plan §11.3): `/login`, `/register` (live password rules), `/check-email` (resend), `/auth/confirm`, `/forgot-password`, `/reset-password` (FR-AUTH-01, 02, 06, 07).
+- `features/auth/api/auth.ts`: all Supabase Auth calls, each throwing `AppError` (sign-up with `full_name`, sign-in, sign-out with scope `local`, resend, reset request, `verifyOtp` for email links, new password).
+- `AuthProvider` / `useAuth`: session state from `onAuthStateChange`; clears the TanStack Query cache on sign-out or when a different user signs in (FR-AUTH-03/04).
+- Route guards: `RequireAuth` sends signed-out users to `/login?next=…`; `PublicOnlyRoute` sends signed-in users on. `safeNextPath()` blocks open redirects.
+- Login shows one generic message for wrong credentials (FR-AUTH-02), a rate-limit message on 429, and "resend confirmation" for unconfirmed accounts. Forgot-password shows the same message whether or not the account exists (FR-AUTH-06).
+- Cloudflare Turnstile CAPTCHA on sign-in, sign-up and reset, enabled only when `VITE_TURNSTILE_SITE_KEY` is set (FR-AUTH-11).
+- Zod schemas for the FR-AUTH-01 password policy (8–72 characters, a letter and a digit; 72 is Supabase's bcrypt limit), name and email; react-hook-form forms with accessible field errors.
+- shadcn `input`, `label`, `card`, `alert`, `sonner` (toasts follow the Tickr theme store; `next-themes` not added).
+- `toAppError()` maps `current_password_required`, `current_password_invalid`, `same_password`, `otp_expired` and `captcha_failed`.
+- Shared test helper `renderRoute()`; 136 unit tests.
+
+### Changed
+
+- Theme effect moved from `AppShell` to `App`, so auth pages follow the theme too.
+- ESLint allows `import type` from `@supabase/supabase-js` anywhere; runtime imports stay restricted to `features/*/api`.
+
 ## [0.1.0] - 2026-11-28
 
 M1 — project setup and architecture.
