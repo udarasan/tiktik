@@ -6,6 +6,17 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 
 ### Added
 
+- `/me` "Profile and settings" page (plan §11.3; moves to `/w/:slug/me` in M3):
+  - Profile form: full name, job title, IANA time zone with a "use my browser's zone" shortcut, and theme (FR-AUTH-08/09).
+  - Change-password form: requires the current password, checks the new one against the policy and that it differs from the current one, then signs out all other sessions (FR-AUTH-05).
+- Account menu in the top bar: initials avatar, name and email, "Profile & settings", **Sign out** (FR-AUTH-03, FR-AUTH-08).
+- `features/profile`: `getMyProfile` / `updateMyProfile` (plan §9.3), `useMyProfile` / `useUpdateMyProfile` hooks, grapheme-safe `initials()`, time zone list from `Intl.supportedValuesOf`.
+- `useThemeSync`: the saved profile theme is applied on sign-in on any device, and later changes are saved to the profile (single writer for `profiles.theme`; a regression test covers the race where the local theme overwrote the saved one).
+- `changePassword()` in the auth API (`updateUser` with `current_password`, then `signOut({ scope: 'others' })`).
+- shadcn `dropdown-menu`, `separator`. 155 unit tests.
+
+### Added
+
 - Auth pages (plan §11.3): `/login`, `/register` (live password rules), `/check-email` (resend), `/auth/confirm`, `/forgot-password`, `/reset-password` (FR-AUTH-01, 02, 06, 07).
 - `features/auth/api/auth.ts`: all Supabase Auth calls, each throwing `AppError` (sign-up with `full_name`, sign-in, sign-out with scope `local`, resend, reset request, `verifyOtp` for email links, new password).
 - `AuthProvider` / `useAuth`: session state from `onAuthStateChange`; clears the TanStack Query cache on sign-out or when a different user signs in (FR-AUTH-03/04).

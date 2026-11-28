@@ -3,6 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { useUiStore } from '@/stores/ui';
 import { renderRoute } from '@/test/render';
 
+vi.mock('@/features/profile/api/profile');
+vi.mock('@/features/auth/api/auth');
+
 function renderAt(path: string) {
   return renderRoute(path).router;
 }
