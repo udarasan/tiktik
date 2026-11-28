@@ -6,6 +6,10 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
 
 ### Added
 
+- Email templates `templates/confirmation.html` and `templates/recovery.html`. Links carry `?token_hash=…&type=email|recovery` to `/auth/confirm` and `/reset-password`, so they work when the email is opened on another device (the default PKCE link only works in the browser that signed up).
+
+### Added
+
 - `profiles` table (migration `identity_profiles`, plan §8.2/§8.4):
   - Columns: `full_name` (1–100 characters, trimmed), `job_title` (≤ 100), `avatar_url` (https only), `time_zone` (IANA id, default `UTC`), `theme` (`light`/`dark`/`system`, default `system`), `created_at`.
   - `on_auth_user_created` trigger creates the profile from the sign-up `full_name`, falling back to the email's local part; it never blocks sign-up (FR-AUTH-01).

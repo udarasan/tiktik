@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <body style="font-family: Inter, system-ui, sans-serif; color: #171717; line-height: 1.5">
+    <h1 style="font-size: 18px">Confirm your Tickr account</h1>
+    <p>Hi {{ .Data.full_name }},</p>
+    <p>Confirm your email address to start using Tickr.</p>
+    <p>
+      <a
+        href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=email"
+        style="
+          display: inline-block;
+          padding: 8px 16px;
+          background: #171717;
+          color: #fff;
+          border-radius: 6px;
+          text-decoration: none;
+        "
+        >Confirm email</a
+      >
+    </p>
+    <p style="color: #737373; font-size: 13px">
+      This link expires in 30 minutes. If you didn't create a Tickr account, you can ignore this
+      email.
+    </p>
+  </body>
+</html>

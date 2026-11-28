@@ -93,6 +93,10 @@ describe('toAppError — Supabase Auth', () => {
     ['refresh_token_already_used', 400, 'UNAUTHENTICATED'],
     ['user_already_exists', 422, 'CONFLICT'],
     ['weak_password', 422, 'VALIDATION_ERROR'],
+    ['current_password_required', 400, 'VALIDATION_ERROR'],
+    ['current_password_invalid', 400, 'VALIDATION_ERROR'],
+    ['same_password', 422, 'VALIDATION_ERROR'],
+    ['otp_expired', 403, 'VALIDATION_ERROR'],
   ])('maps %s (%i) to %s and keeps the auth code', (code, status, expected) => {
     const err = toAppError(authError(code, status));
     expect(err.code).toBe(expected);

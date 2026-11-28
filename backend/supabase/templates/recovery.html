@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <body style="font-family: Inter, system-ui, sans-serif; color: #171717; line-height: 1.5">
+    <h1 style="font-size: 18px">Reset your Tickr password</h1>
+    <p>We received a request to reset the password for this email address.</p>
+    <p>
+      <a
+        href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=recovery"
+        style="
+          display: inline-block;
+          padding: 8px 16px;
+          background: #171717;
+          color: #fff;
+          border-radius: 6px;
+          text-decoration: none;
+        "
+        >Choose a new password</a
+      >
+    </p>
+    <p style="color: #737373; font-size: 13px">
+      This link expires in 30 minutes and can be used once. If you didn't ask for this, you can
+      ignore this email; your password won't change.
+    </p>
+  </body>
+</html>

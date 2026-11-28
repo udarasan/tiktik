@@ -14,5 +14,10 @@ export default defineConfig({
     globals: true,
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // Public env for tests; components under test mock features/*/api, so nothing is called.
+    env: {
+      VITE_SUPABASE_URL: 'http://127.0.0.1:54321',
+      VITE_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test',
+    },
   },
 });

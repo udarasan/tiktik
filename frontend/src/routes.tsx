@@ -1,16 +1,41 @@
 import type { RouteObject } from 'react-router';
 import { AppShell } from '@/components/layout/AppShell';
+import { PublicOnlyRoute, RequireAuth } from '@/features/auth/components/RouteGuards';
+import { CheckEmailPage } from '@/pages/auth/CheckEmailPage';
+import { ConfirmEmailPage } from '@/pages/auth/ConfirmEmailPage';
+import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
+import { LoginPage } from '@/pages/auth/LoginPage';
+import { RegisterPage } from '@/pages/auth/RegisterPage';
+import { ResetPasswordPage } from '@/pages/auth/ResetPasswordPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
-// Route tree grows per milestone: public auth pages outside the shell (M2),
-// /w/:slug (M3), /w/:slug/p/:key/{list,board} (M4+). Plan §7.11, §11.2.
+// Plan §7.11, §11.2–11.3. /w/:slug (M3) and /w/:slug/p/:key (M4+) arrive later.
 export const routes: RouteObject[] = [
+  // Public, only while signed out
   {
-    element: <AppShell />,
+    element: <PublicOnlyRoute />,
     children: [
-      { index: true, element: <DashboardPage /> },
-      { path: '*', element: <NotFoundPage /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <RegisterPage /> },
+      { path: '/forgot-password', element: <ForgotPasswordPage /> },
+    ],
+  },
+  // Public, any state (email links)
+  { path: '/check-email', element: <CheckEmailPage /> },
+  { path: '/auth/confirm', element: <ConfirmEmailPage /> },
+  { path: '/reset-password', element: <ResetPasswordPage /> },
+  // Signed in
+  {
+    element: <RequireAuth />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          { index: true, element: <DashboardPage /> },
+          { path: '*', element: <NotFoundPage /> },
+        ],
+      },
     ],
   },
 ];

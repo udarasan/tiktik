@@ -29,6 +29,8 @@ export default defineConfig([
             {
               name: '@supabase/supabase-js',
               message: 'Import Supabase only in src/lib/supabase.ts or src/features/*/api.',
+              // Types (Session, User) are fine anywhere; runtime calls stay in api/.
+              allowTypeImports: true,
             },
           ],
         },
@@ -40,7 +42,8 @@ export default defineConfig([
     rules: { 'no-restricted-imports': 'off' },
   },
   {
-    files: ['src/components/ui/**/*.tsx'],
+    // shadcn components and test helpers are never hot-reloaded as pages.
+    files: ['src/components/ui/**/*.tsx', 'src/test/**/*.tsx', 'src/**/*.test.tsx'],
     rules: { 'react-refresh/only-export-components': 'off' },
   },
 ]);
