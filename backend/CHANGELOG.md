@@ -4,6 +4,14 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
 
 ## [Unreleased]
 
+### Added
+
+- `profiles` table (migration `identity_profiles`, plan §8.2/§8.4):
+  - Columns: `full_name` (1–100 characters, trimmed), `job_title` (≤ 100), `avatar_url` (https only), `time_zone` (IANA id, default `UTC`), `theme` (`light`/`dark`/`system`, default `system`), `created_at`.
+  - `on_auth_user_created` trigger creates the profile from the sign-up `full_name`, falling back to the email's local part; it never blocks sign-up (FR-AUTH-01).
+  - Browser roles may read their own row and update only the 5 editable columns; no direct insert or delete. RLS restricts reads and updates to self (FR-AUTH-08/09); teammates' read access follows in M3.
+- pgTAP `010_identity_profiles_test.sql`: 33 assertions covering the schema, the trigger, privileges, the self-only RLS, validation errors (23514) and the cascade delete.
+
 ### Changed
 
 - Auth settings in `config.jsonc` for M2:
