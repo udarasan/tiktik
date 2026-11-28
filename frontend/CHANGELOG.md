@@ -6,6 +6,12 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 
 ### Added
 
+- Playwright E2E suite (`frontend/e2e`, `npm run e2e`), 8 tests against the local Supabase stack, reading emails from Mailpit:
+  - J1 (auth part): sign up, sign-in blocked until confirmed, confirm on another device, sign in, sign out, protected-page redirect.
+  - FR-AUTH-01 password policy in the form; FR-AUTH-02 generic wrong-credentials message and `?next=`; open-redirect protection.
+  - FR-AUTH-06 reset on another device, single-use link, old password rejected, no account enumeration.
+  - FR-AUTH-08/09 profile edits persist and the theme follows the user to another device; FR-AUTH-05 change password needs the current one and revokes other devices' refresh tokens.
+- `playwright.config.ts`: own dev server on port 5180 (`--bypass-lock`), traces and screenshots on failure, `PLAYWRIGHT_CHANNEL=chrome` to use installed Chrome locally; `tsconfig.e2e.json`.
 - `/me` "Profile and settings" page (plan §11.3; moves to `/w/:slug/me` in M3):
   - Profile form: full name, job title, IANA time zone with a "use my browser's zone" shortcut, and theme (FR-AUTH-08/09).
   - Change-password form: requires the current password, checks the new one against the policy and that it differs from the current one, then signs out all other sessions (FR-AUTH-05).
@@ -14,9 +20,6 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 - `useThemeSync`: the saved profile theme is applied on sign-in on any device, and later changes are saved to the profile (single writer for `profiles.theme`; a regression test covers the race where the local theme overwrote the saved one).
 - `changePassword()` in the auth API (`updateUser` with `current_password`, then `signOut({ scope: 'others' })`).
 - shadcn `dropdown-menu`, `separator`. 155 unit tests.
-
-### Added
-
 - Auth pages (plan §11.3): `/login`, `/register` (live password rules), `/check-email` (resend), `/auth/confirm`, `/forgot-password`, `/reset-password` (FR-AUTH-01, 02, 06, 07).
 - `features/auth/api/auth.ts`: all Supabase Auth calls, each throwing `AppError` (sign-up with `full_name`, sign-in, sign-out with scope `local`, resend, reset request, `verifyOtp` for email links, new password).
 - `AuthProvider` / `useAuth`: session state from `onAuthStateChange`; clears the TanStack Query cache on sign-out or when a different user signs in (FR-AUTH-03/04).
