@@ -80,6 +80,7 @@ supabase migration new <module>_<change>
 supabase test db                    # pgTAP
 supabase db advisors                # security/performance checks
 supabase functions serve            # local Edge Functions
+# CLI 3.x: commands default to the LOCAL stack; remote needs --remote (e.g. `supabase db push --remote`). CI does this, not developers.
 
 # from repo root
 npm run db:types                    # regenerate packages/db-types/src/database.ts from the local stack

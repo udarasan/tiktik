@@ -1,0 +1,97 @@
+# Backend CI: migrations, pgTAP, advisors, generated-types drift (CONTRIBUTING.md › CI).
+# Runs on every PR; the heavy job only when backend/ or packages/db-types/ change.
+# Require the "backend-summary" check in branch protection (it always reports).
+name: backend
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  SUPABASE_CLI_VERSION: 3.4.0
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'packages/db-types/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/backend.yml'
+
+  database:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: supabase/setup-cli@689adcfb80d947100a1eab127289b97d1fb07b13 # v3.2.0
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: Start local Supabase (database services only)
+        working-directory: backend
+        run: supabase start -x studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor
+
+      - name: Rebuild from migrations + seed
+        working-directory: backend
+        run: supabase db reset
+
+      - name: pgTAP tests
+        working-directory: backend
+        run: supabase test db
+
+      - name: Advisors (fail on warnings)
+        working-directory: backend
+        run: supabase db advisors --fail-on warn
+
+      - name: Generated types are up to date
+        run: npm run db:types:check
+
+      - name: Stop Supabase
+        if: always()
+        working-directory: backend
+        run: supabase stop --no-backup
+
+  summary:
+    name: backend-summary
+    if: always()
+    needs: [changes, database]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          echo "changes=${{ needs.changes.result }} database=${{ needs.database.result }}"
+          if [[ "${{ needs.changes.result }}" != "success" ]]; then exit 1; fi
+          if [[ "${{ needs.database.result }}" == "failure" || "${{ needs.database.result }}" == "cancelled" ]]; then exit 1; fi
