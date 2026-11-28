@@ -4,6 +4,7 @@
   "description": "Tickr — team project and task manager (monorepo: backend/ Supabase, frontend/ Vite React, packages/db-types).",
   "type": "module",
   "workspaces": [
+    "frontend",
     "packages/*"
   ],
   "engines": {
