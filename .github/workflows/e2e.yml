@@ -60,6 +60,13 @@ jobs:
 
       - run: npm ci
 
+      # Supabase's local ports (54321-54327) sit inside Linux's default ephemeral port range
+      # (32768-60999). While `supabase start` pulls images in parallel, an outgoing connection
+      # can take one of them and the container fails with "address already in use".
+      # Move ephemeral ports above Supabase's before starting.
+      - name: Keep Supabase ports out of the ephemeral range
+        run: sudo sysctl -w net.ipv4.ip_local_port_range="60001 65535"
+
       - name: Start local Supabase (Auth, API, database, Mailpit)
         working-directory: backend
         run: supabase start -x studio,imgproxy,storage-api,realtime,edge-runtime,logflare,vector,supavisor
