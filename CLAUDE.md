@@ -86,7 +86,7 @@ supabase functions serve            # local Edge Functions
 npm run db:types                    # regenerate packages/db-types/src/database.ts from the local stack
 npm run env:local                   # write frontend/.env.local (URL + publishable key) from the local stack
 npm run dev -w frontend | npm test -w frontend | npm run lint -w frontend | npm run typecheck -w frontend
-npx playwright test -c frontend
+npm run e2e -w frontend            # Playwright E2E (stack running + env:local); locally add PLAYWRIGHT_CHANNEL=chrome to use installed Chrome
 ```
 
 ## How to work

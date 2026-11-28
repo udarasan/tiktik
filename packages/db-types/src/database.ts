@@ -1,29 +1,39 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type Database = {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: { extensions?: Json; operationName?: string; query?: string; variables?: Json };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
-      [_ in never]: never;
+      profiles: {
+        Row: {
+          avatar_url: string | null;
+          created_at: string;
+          full_name: string;
+          id: string;
+          job_title: string | null;
+          theme: string;
+          time_zone: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          avatar_url?: string | null;
+          created_at?: string;
+          full_name: string;
+          id: string;
+          job_title?: string | null;
+          theme?: string;
+          time_zone?: string;
+        };
+        Update: {
+          avatar_url?: string | null;
+          created_at?: string;
+          full_name?: string;
+          id?: string;
+          job_title?: string | null;
+          theme?: string;
+          time_zone?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -142,9 +152,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

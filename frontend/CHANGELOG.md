@@ -4,6 +4,42 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-28
+
+M2 — authentication and profiles.
+
+### Added
+
+- Playwright E2E suite (`frontend/e2e`, `npm run e2e`), 8 tests against the local Supabase stack, reading emails from Mailpit:
+  - J1 (auth part): sign up, sign-in blocked until confirmed, confirm on another device, sign in, sign out, protected-page redirect.
+  - FR-AUTH-01 password policy in the form; FR-AUTH-02 generic wrong-credentials message and `?next=`; open-redirect protection.
+  - FR-AUTH-06 reset on another device, single-use link, old password rejected, no account enumeration.
+  - FR-AUTH-08/09 profile edits persist and the theme follows the user to another device; FR-AUTH-05 change password needs the current one and revokes other devices' refresh tokens.
+- `playwright.config.ts`: own dev server on port 5180 (`--bypass-lock`), traces and screenshots on failure, `PLAYWRIGHT_CHANNEL=chrome` to use installed Chrome locally; `tsconfig.e2e.json`.
+- `/me` "Profile and settings" page (plan §11.3; moves to `/w/:slug/me` in M3):
+  - Profile form: full name, job title, IANA time zone with a "use my browser's zone" shortcut, and theme (FR-AUTH-08/09).
+  - Change-password form: requires the current password, checks the new one against the policy and that it differs from the current one, then signs out all other sessions (FR-AUTH-05).
+- Account menu in the top bar: initials avatar, name and email, "Profile & settings", **Sign out** (FR-AUTH-03, FR-AUTH-08).
+- `features/profile`: `getMyProfile` / `updateMyProfile` (plan §9.3), `useMyProfile` / `useUpdateMyProfile` hooks, grapheme-safe `initials()`, time zone list from `Intl.supportedValuesOf`.
+- `useThemeSync`: the saved profile theme is applied on sign-in on any device, and later changes are saved to the profile (single writer for `profiles.theme`; a regression test covers the race where the local theme overwrote the saved one).
+- `changePassword()` in the auth API (`updateUser` with `current_password`, then `signOut({ scope: 'others' })`).
+- shadcn `dropdown-menu`, `separator`. 155 unit tests.
+- Auth pages (plan §11.3): `/login`, `/register` (live password rules), `/check-email` (resend), `/auth/confirm`, `/forgot-password`, `/reset-password` (FR-AUTH-01, 02, 06, 07).
+- `features/auth/api/auth.ts`: all Supabase Auth calls, each throwing `AppError` (sign-up with `full_name`, sign-in, sign-out with scope `local`, resend, reset request, `verifyOtp` for email links, new password).
+- `AuthProvider` / `useAuth`: session state from `onAuthStateChange`; clears the TanStack Query cache on sign-out or when a different user signs in (FR-AUTH-03/04).
+- Route guards: `RequireAuth` sends signed-out users to `/login?next=…`; `PublicOnlyRoute` sends signed-in users on. `safeNextPath()` blocks open redirects.
+- Login shows one generic message for wrong credentials (FR-AUTH-02), a rate-limit message on 429, and "resend confirmation" for unconfirmed accounts. Forgot-password shows the same message whether or not the account exists (FR-AUTH-06).
+- Cloudflare Turnstile CAPTCHA on sign-in, sign-up and reset, enabled only when `VITE_TURNSTILE_SITE_KEY` is set (FR-AUTH-11).
+- Zod schemas for the FR-AUTH-01 password policy (8–72 characters, a letter and a digit; 72 is Supabase's bcrypt limit), name and email; react-hook-form forms with accessible field errors.
+- shadcn `input`, `label`, `card`, `alert`, `sonner` (toasts follow the Tickr theme store; `next-themes` not added).
+- `toAppError()` maps `current_password_required`, `current_password_invalid`, `same_password`, `otp_expired` and `captcha_failed`.
+- Shared test helper `renderRoute()`; 136 unit tests.
+
+### Changed
+
+- Theme effect moved from `AppShell` to `App`, so auth pages follow the theme too.
+- ESLint allows `import type` from `@supabase/supabase-js` anywhere; runtime imports stay restricted to `features/*/api`.
+
 ## [0.1.0] - 2026-11-28
 
 M1 — project setup and architecture.
@@ -41,5 +77,6 @@ M1 — project setup and architecture.
 - Sidebar: the Collapse button looked permanently pressed (shadcn styles `aria-expanded="true"`).
 - Sidebar: the "+ create project" button still showed in the collapsed rail at ≥ 1024 px, because conflicting `hidden` / `lg:inline-flex` classes were both applied.
 
-[Unreleased]: https://github.com/udarasan/tiktik/compare/frontend-v0.1.0...develop
+[Unreleased]: https://github.com/udarasan/tiktik/compare/frontend-v0.2.0...develop
+[0.2.0]: https://github.com/udarasan/tiktik/compare/frontend-v0.1.0...frontend-v0.2.0
 [0.1.0]: https://github.com/udarasan/tiktik/releases/tag/frontend-v0.1.0

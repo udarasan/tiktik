@@ -1,6 +1,7 @@
 import { Bell, Menu, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUiStore } from '@/stores/ui';
+import { AccountMenu } from '@/features/profile/components/AccountMenu';
 import { ThemeToggle } from './ThemeToggle';
 
 export function TopBar() {
@@ -41,13 +42,7 @@ export function TopBar() {
           <Bell />
         </Button>
         <ThemeToggle />
-        <span
-          aria-label="Account (available in M2)"
-          role="img"
-          className="ml-1 flex size-8 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground"
-        >
-          ?
-        </span>
+        <AccountMenu />
       </div>
     </header>
   );

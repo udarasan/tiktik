@@ -136,6 +136,12 @@ const AUTH_CODE_MAP: Record<string, GeneralErrorCode> = {
   validation_failed: 'VALIDATION_ERROR',
   over_request_rate_limit: 'RATE_LIMITED',
   over_email_send_rate_limit: 'RATE_LIMITED',
+  // M2 (Auth config): password change and email-link flows
+  current_password_required: 'VALIDATION_ERROR',
+  current_password_invalid: 'VALIDATION_ERROR',
+  same_password: 'VALIDATION_ERROR',
+  otp_expired: 'VALIDATION_ERROR',
+  captcha_failed: 'VALIDATION_ERROR',
 };
 
 function statusToCode(status: number): GeneralErrorCode {

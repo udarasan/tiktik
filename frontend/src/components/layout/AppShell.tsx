@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router';
-import { useThemeEffect } from '@/hooks/useThemeEffect';
+import { useThemeSync } from '@/features/profile/hooks/useThemeSync';
 import { useUiStore } from '@/stores/ui';
 import { cn } from 'cn';
 import { Sidebar } from './Sidebar';
@@ -11,7 +11,7 @@ import { TopBar } from './TopBar';
  * ≥ 1024 px sidebar 240 px (collapsible to icons) · 768–1023 px icon rail · < 768 px drawer.
  */
 export function AppShell() {
-  useThemeEffect();
+  useThemeSync();
   const collapsed = useUiStore((s) => s.sidebarCollapsed);
   const mobileNavOpen = useUiStore((s) => s.mobileNavOpen);
   const setMobileNavOpen = useUiStore((s) => s.setMobileNavOpen);
