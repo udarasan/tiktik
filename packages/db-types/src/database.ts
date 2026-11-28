@@ -3,6 +3,101 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      audit_events: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          created_at: string;
+          details: NonNullable<Json>;
+          id: string;
+          workspace_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          id?: string;
+          workspace_id: string;
+        };
+        Update: {
+          action?: string;
+          actor_id?: string | null;
+          created_at?: string;
+          details?: NonNullable<Json>;
+          id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'audit_events_actor_id_fkey';
+            columns: ['actor_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'audit_events_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      invitations: {
+        Row: {
+          created_at: string;
+          email: string;
+          expires_at: string;
+          id: string;
+          invited_by: string;
+          role: string;
+          status: string;
+          token_hash: string;
+          workspace_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          email: string;
+          expires_at?: string;
+          id?: string;
+          invited_by: string;
+          role: string;
+          status?: string;
+          token_hash: string;
+          workspace_id: string;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          expires_at?: string;
+          id?: string;
+          invited_by?: string;
+          role?: string;
+          status?: string;
+          token_hash?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'invitations_invited_by_fkey';
+            columns: ['invited_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'invitations_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -33,6 +128,85 @@ export type Database = {
           time_zone?: string;
         };
         Relationships: [];
+      };
+      workspace_members: {
+        Row: {
+          joined_at: string;
+          role: string;
+          status: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          joined_at?: string;
+          role: string;
+          status?: string;
+          user_id: string;
+          workspace_id: string;
+        };
+        Update: {
+          joined_at?: string;
+          role?: string;
+          status?: string;
+          user_id?: string;
+          workspace_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'workspace_members_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'workspace_members_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      workspaces: {
+        Row: {
+          created_at: string;
+          deleted_at: string | null;
+          description: string | null;
+          id: string;
+          name: string;
+          owner_id: string;
+          slug: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name: string;
+          owner_id: string;
+          slug: string;
+        };
+        Update: {
+          created_at?: string;
+          deleted_at?: string | null;
+          description?: string | null;
+          id?: string;
+          name?: string;
+          owner_id?: string;
+          slug?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'workspaces_owner_id_fkey';
+            columns: ['owner_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
     Views: {
