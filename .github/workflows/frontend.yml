@@ -1,0 +1,75 @@
+# Frontend CI: lint, typecheck, unit tests, build (CONTRIBUTING.md › CI).
+# Runs on every PR; the heavy job only when frontend/ or packages/db-types/ change.
+# Require the "frontend-summary" check in branch protection (it always reports).
+name: frontend
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+              - 'packages/db-types/**'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/frontend.yml'
+
+  app:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true' || github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint -w frontend
+      - run: npm run typecheck -w frontend
+      - run: npm test -w frontend
+      - name: Build
+        run: npm run build -w frontend
+        env:
+          # Build-time placeholders; real values are injected by the hosting provider (M9).
+          VITE_SUPABASE_URL: http://127.0.0.1:54321
+          VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder
+
+  summary:
+    name: frontend-summary
+    if: always()
+    needs: [changes, app]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          echo "changes=${{ needs.changes.result }} app=${{ needs.app.result }}"
+          if [[ "${{ needs.changes.result }}" != "success" ]]; then exit 1; fi
+          if [[ "${{ needs.app.result }}" == "failure" || "${{ needs.app.result }}" == "cancelled" ]]; then exit 1; fi

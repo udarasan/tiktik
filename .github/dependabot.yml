@@ -1,0 +1,34 @@
+# NFR-SEC-07: dependency scanning. PRs target develop and follow CONTRIBUTING.md conventions.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels: [dependencies]
+    commit-message:
+      prefix: 'build(deps)'
+      prefix-development: 'build(deps-dev)'
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # typescript-eslint supports TypeScript < 6.1 (see frontend CHANGELOG); bump together manually.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies, repo]
+    commit-message:
+      prefix: 'ci(deps)'
+    groups:
+      actions:
+        patterns: ['*']

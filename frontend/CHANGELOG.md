@@ -25,3 +25,4 @@ All notable changes to the Tickr frontend. Format: [Keep a Changelog](https://ke
 - Light / dark / system theme (Zustand store `tickr-ui`, applied before first paint without an inline script); priority and status-category colour tokens for both themes (plan §11.7).
 - Inter variable font and 14 px base text (plan §11.7), replacing shadcn's default Geist.
 - Dashboard and not-found placeholder pages inside the shell.
+- CI (`.github/workflows/frontend.yml`): lint, typecheck, unit tests and build on every frontend change.
