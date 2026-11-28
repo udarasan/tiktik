@@ -19,6 +19,9 @@ updates:
       # typescript-eslint supports TypeScript < 6.1 (see frontend CHANGELOG); bump together manually.
       - dependency-name: typescript
         update-types: [version-update:semver-major]
+      # @types/node must match the Node runtime (.nvmrc = 22); bump with the runtime, not on its own.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
