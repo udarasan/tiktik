@@ -4,6 +4,10 @@ All notable changes to the Tickr backend. Format: [Keep a Changelog](https://kee
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-28
+
+M2 — authentication and profiles.
+
 ### Added
 
 - Email templates `templates/confirmation.html` and `templates/recovery.html`. Links carry `?token_hash=…&type=email|recovery` to `/auth/confirm` and `/reset-password`, so they work when the email is opened on another device (the default PKCE link only works in the browser that signed up).
@@ -41,5 +45,6 @@ M1 — project setup and architecture.
 - CI (`.github/workflows/backend.yml`): local stack, `db reset`, pgTAP, advisors (fail on warnings) and the generated-types drift check on every backend change.
 - Staging deploy workflow (`deploy-staging.yml`): links the staging project and runs `db push --remote` and `functions deploy` on pushes to `develop`; skips until staging secrets are configured.
 
-[Unreleased]: https://github.com/udarasan/tiktik/compare/backend-v0.1.0...develop
+[Unreleased]: https://github.com/udarasan/tiktik/compare/backend-v0.2.0...develop
+[0.2.0]: https://github.com/udarasan/tiktik/compare/backend-v0.1.0...backend-v0.2.0
 [0.1.0]: https://github.com/udarasan/tiktik/releases/tag/backend-v0.1.0
