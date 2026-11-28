@@ -213,7 +213,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      create_workspace: { Args: { p_name: string }; Returns: Json };
+      leave_workspace: { Args: { p_ws_id: string }; Returns: undefined };
+      remove_workspace_member: { Args: { p_user_id: string; p_ws_id: string }; Returns: undefined };
+      transfer_ownership: { Args: { p_new_owner_id: string; p_ws_id: string }; Returns: undefined };
+      update_member_role: {
+        Args: { p_role: string; p_user_id: string; p_ws_id: string };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;
